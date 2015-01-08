@@ -1,0 +1,3 @@
+lxml
+textplot
+-e git+https://github.com/SeNeReKo/TCFlib.git
