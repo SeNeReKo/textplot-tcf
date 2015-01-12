@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
+
 from .text import Text
 from textplot.matrix import Matrix
 from textplot.graphs import Skimmer
 
 
-def frequent(path, term_depth=500, skim_depth=10, d_weights=False, **kwargs):
+def frequent(path, term_depth=500, skim_depth=10, d_weights=False,
+             stopwordfile=None, postags=None, **kwargs):
 
     """
     Use most frequent terms.
     """
-
-    t = Text.from_file(path)
+    
+    t = Text.from_file(path, stopwordfile=stopwordfile, postags=postags)
     m = Matrix(t)
 
     print('Indexing terms:')
