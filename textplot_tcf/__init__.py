@@ -9,13 +9,14 @@ from textplot.graphs import Skimmer
 
 
 def frequent(path, term_depth=500, skim_depth=10, d_weights=False,
-             stopwordfile=None, postags=None, **kwargs):
+             stopwordfile=None, postags=None, disambiguate=False, **kwargs):
 
     """
     Use most frequent terms.
     """
     
-    t = Text.from_file(path, stopwordfile=stopwordfile, postags=postags)
+    t = Text.from_file(path, stopwordfile=stopwordfile, postags=postags,
+                       disambiguate=disambiguate)
     m = Matrix(t)
 
     print('Indexing terms:')

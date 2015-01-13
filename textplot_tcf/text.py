@@ -23,7 +23,8 @@ class Text(Text_):
         # Since it is an XML file, read it in binary format.
         return cls(open(path, 'rb').read(), **kwargs)
 
-    def __init__(self, text, stopwordfile=None, postags=None):
+    def __init__(self, text, stopwordfile=None, postags=None,
+                 disambiguate=False):
         """
         Parse the annotated TCF file into a `TextCorpus`.
         
@@ -33,18 +34,23 @@ class Text(Text_):
             used.
         :param postags: List of MAF part-of-speech tags that are taken into
             account.
+        :param disambiguate: Use wordsenses information from TCF to
+            disambiguate lemmas.
 
         """
         self.stopwordfile = stopwordfile
         
         self.postags = postags
+        layers = ['text', 'tokens', 'lemmas']
         if self.postags:
             from tcflib.tagsets import TagSet
             self.tagset = TagSet('DC-1345')
             self.postags = [self.tagset[tag] for tag in postags]
-            layers = ['text', 'tokens', 'lemmas', 'POStags']
-        else:
-            layers = ['text', 'tokens', 'lemmas']
+            layers.append('POStags')
+            
+        self.disambiguate = disambiguate
+        if self.disambiguate:
+            layers.append('wsd')
         
         self.corpus = TextCorpus(text, layers=layers)
         self.text = self.corpus.text.text
@@ -57,8 +63,13 @@ class Text(Text_):
 
         """
         for offset, token in enumerate(self.corpus.tokens):
+            if self.disambiguate:
+                stemmed = '{} ({})'.format(token.lemma,
+                                           ', '.join(token.wordsenses))
+            else:
+                stemmed = token.lemma
             yield { # Emit the token.
-                'stemmed':      token.lemma,
+                'stemmed':      stemmed,
                 'unstemmed':    token.text,
                 'offset':       offset,
                 'left':         None,
